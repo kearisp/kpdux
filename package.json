@@ -1,0 +1,24 @@
+{
+    "name": "kpdux",
+    "version": "1.0.17",
+    "author": "Kris Papercut <kearis666@gmail.com>",
+    "license": "ISC",
+    "main": "src/index.js",
+    "description": "js lib",
+    "keywords": [
+        "kp",
+        "kpdux",
+        "redux"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://bitbucket.org/kearis/kpdux.git"
+    },
+    "homepage": "https://bitbucket.org/kearis/kpdux/src/master/README.md",
+    "peerDependencies": {
+        "redux": "4.x.x"
+    },
+    "devDependencies": {
+        "redux": "^4.0.4"
+    }
+}
