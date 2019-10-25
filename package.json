@@ -12,9 +12,9 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+https://bitbucket.org/kearis/kpdux.git"
+        "url": "git+https://github.com/kearisp/kpdux.git"
     },
-    "homepage": "https://bitbucket.org/kearis/kpdux/src/master/README.md",
+    "homepage": "https://github.com/kearisp/kpdux/blob/master/README.md",
     "peerDependencies": {
         "redux": "4.x.x"
     },
