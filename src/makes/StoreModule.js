@@ -59,6 +59,12 @@ class StoreModule {
         if(params.getters) {
             this._data.getters = params.getters;
         }
+
+        Object.defineProperty(this, "rootGetters", {
+            "get": () => {
+                return this.getRootGetters();
+            }
+        });
     }
 
     getRootGetters() {

@@ -1,6 +1,6 @@
 {
     "name": "kpdux",
-    "version": "1.0.17",
+    "version": "1.0.18",
     "author": "Kris Papercut <kearis666@gmail.com>",
     "license": "ISC",
     "main": "src/index.js",
