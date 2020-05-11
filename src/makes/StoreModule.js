@@ -254,10 +254,6 @@ class StoreModule {
         }
     }
 
-    getter(name) {
-
-    }
-
     dispatch(action, ...args) {
         return this.store.dispatch({
             "type": action,
@@ -273,6 +269,7 @@ class StoreModule {
         return {};
     }
 }
+
 
 export {
     StoreModule
