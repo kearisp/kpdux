@@ -4,8 +4,8 @@
     "description": "js lib",
     "author": "Kris Papercut <kearis666@gmail.com>",
     "license": "ISC",
-    "main": "lib/index.js",
-    "types": "lib/index.d.ts",
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.ts",
     "keywords": [
         "kp",
         "kpdux",

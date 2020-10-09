@@ -40,6 +40,7 @@ export interface IStore<State> {
     rootGetters:{
         [key:string]:any;
     };
+    getState:() => State;
     dispatch:(...args:any[]) => any;
 }
 
