@@ -1,8 +1,8 @@
-import StoreModule from "./../makes/StoreModule";
+import StoreModule from "../makes/StoreModule";
 
 
-export default (name, ...parts) => {
-    let moduleData = {};
+export default (name:any, ...parts:any) => {
+    let moduleData:any = {};
 
     if(typeof name !== "string") {
         parts.unshift(name);

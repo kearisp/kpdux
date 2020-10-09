@@ -1,7 +1,7 @@
-import Store from "./../makes/Store";
+import Store from "../makes/Store";
 
 
-export default (modules = {}, reducers = {}, middlewares = []) => {
+export default (modules:any = {}, reducers:any = {}, middlewares:any[] = []) => {
     let store = new Store({
         modules,
         reducers,

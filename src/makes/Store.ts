@@ -1,10 +1,14 @@
 import * as redux from "redux";
 
-import createModule from "./../utils/createModule";
+import createModule from "../utils/createModule";
 
 
 class Store {
-    constructor(params) {
+    modules:any;
+    store:any;
+    [key:string]:any;
+
+    constructor(params:any) {
         const {
             modules = {},
             reducers = {},
@@ -13,8 +17,8 @@ class Store {
 
         this.modules = {};
 
-        let modulesRedusers = {};
-        let modulesMiddlewares = [];
+        let modulesRedusers:any = {};
+        let modulesMiddlewares:any = [];
 
         for(let name in modules) {
             this.modules[name] = createModule(modules[name]);
