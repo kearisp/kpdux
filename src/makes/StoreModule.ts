@@ -256,7 +256,7 @@ class StoreModule {
         }
     }
 
-    dispatch(action, ...args) {
+    dispatch(action:any, ...args:any[]) {
         return this.store.dispatch({
             "type": action,
             "data": args
