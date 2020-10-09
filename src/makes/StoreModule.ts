@@ -2,12 +2,14 @@ import * as redux from "redux";
 
 
 class StoreModule {
+    [key:string]:any;
+
     /**
      * @constructor
      * @param name      string
      * @param params    object
      */
-    constructor(name, params = {}) {
+    constructor(name:string, params:any = {}) {
         this.name = name;
 
         this.state = {};
@@ -68,7 +70,7 @@ class StoreModule {
     }
 
     getRootGetters() {
-        let rootGetters = {};
+        let rootGetters:any = {};
 
         if(this.store.kpduxModules) {
             Object.keys(this.store.kpduxModules).map((name) => {
@@ -79,7 +81,7 @@ class StoreModule {
         return rootGetters;
     }
 
-    getGetterCreator(getter) {
+    getGetterCreator(getter:any) {
         return () => {
             return getter.apply(this, [
                 this.getState(),
@@ -90,7 +92,7 @@ class StoreModule {
         };
     }
 
-    getActionCreator(name) {
+    getActionCreator(name:string) {
         let _this = this;
 
         return function() {
@@ -102,7 +104,7 @@ class StoreModule {
     }
 
     reduce() {
-        return (state, action) => {
+        return (state:any, action:any) => {
             return this.onReduce(state, action);
         }
     }
@@ -110,13 +112,13 @@ class StoreModule {
     middleware() {
         let _this = this;
 
-        return (store) => {
-            return (next) => {
-                return (action) => {
+        return (store:any) => {
+            return (next:any) => {
+                return (action:any) => {
                     let res = _this.onMiddleware(store, action);
 
                     if(res) {
-                        return Promise.resolve(res).then((data) => {
+                        return Promise.resolve(res).then((data:any) => {
                             next(action);
 
                             return data;
@@ -130,7 +132,7 @@ class StoreModule {
         };
     }
 
-    onReduce(state, action) {
+    onReduce(state:any, action:any) {
         if(!state) {
             state = this.state;
         }
@@ -178,7 +180,7 @@ class StoreModule {
         return state;
     }
 
-    onMiddleware(store, action) {
+    onMiddleware(store:any, action:any) {
         if(this._data.middlewares["*"]) {
             this._data.middlewares["*"].apply(this, [action]);
         }
@@ -199,7 +201,7 @@ class StoreModule {
         return null;
     }
 
-    setActions(store) {
+    setActions(store:any) {
         this.store = store;
 
         this._data.init.apply(this, [store]);

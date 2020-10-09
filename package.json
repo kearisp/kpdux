@@ -1,10 +1,11 @@
 {
     "name": "kpdux",
-    "version": "1.0.18",
+    "version": "2.0.0",
+    "description": "js lib",
     "author": "Kris Papercut <kearis666@gmail.com>",
     "license": "ISC",
-    "main": "src/index.js",
-    "description": "js lib",
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.ts",
     "keywords": [
         "kp",
         "kpdux",
@@ -15,10 +16,19 @@
         "url": "git+https://github.com/kearisp/kpdux.git"
     },
     "homepage": "https://github.com/kearisp/kpdux/blob/master/README.md",
+    "scripts": {
+        "prepublish": "npm run build",
+        "build": "tsc -b tsconfig.json",
+        "watch:build": "tsc -b tsconfig.json --watch"
+    },
     "peerDependencies": {
         "redux": "4.x.x"
     },
     "devDependencies": {
-        "redux": "^4.0.4"
+        "@typescript-eslint/eslint-plugin": "^4.4.0",
+        "@typescript-eslint/parser": "^4.4.0",
+        "eslint": "^7.10.0",
+        "redux": "^4.0.4",
+        "typescript": "^4.0.3"
     }
 }

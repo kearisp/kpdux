@@ -1,12 +1,12 @@
-export default function() {
+export default function(...args:any[]) {
     let composes = [];
 
-    for(let i = 0; i < arguments.length; i++) {
-        composes[i] = arguments[i];
+    for(let i = 0; i < args.length; i++) {
+        composes[i] = args[i];
     }
 
     if(composes.length === 0) {
-        return function(arg) {
+        return function(arg:any) {
             return arg;
         };
     }
@@ -17,7 +17,7 @@ export default function() {
 
     return composes.reduce(function(a, b) {
         return function() {
-            return a(b.apply(undefined, arguments));
+            return a(b.apply(undefined, args));
         };
     });
 };
