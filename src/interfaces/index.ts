@@ -23,7 +23,6 @@ export interface IGetters<State> {
 export interface IActions<State> {
     [key:string]:(
         this:IStore<State> & IGetters<State> & IActions<State> & IMutations<State>,
-        type:string,
         ...args:any[]
     ) => any;
 }
