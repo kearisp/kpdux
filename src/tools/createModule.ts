@@ -1,7 +1,7 @@
 import StoreModule from "../makes/StoreModule";
 
 
-export default (name:any, ...parts:any) => {
+export default (name:any, ...parts:any[]):StoreModule => {
     let moduleData:any = {};
 
     if(typeof name !== "string") {
@@ -32,29 +32,28 @@ export default (name:any, ...parts:any) => {
             part = part._data || part;
 
             moduleData = {
-                "init": moduleData.init || part.init || (() => {}),
-                "name": moduleData.name || part.name,
-                "state": {
+                name: moduleData.name || part.name,
+                state: {
                     ...(moduleData.state || {}),
                     ...(part.state || {})
                 },
-                "reduces": {
+                reduces: {
                     ...(moduleData.reduces || {}),
                     ...(part.reduces || {})
                 },
-                "middlewares": {
+                middlewares: {
                     ...(moduleData.middlewares || {}),
                     ...(part.middlewares || {})
                 },
-                "getters": {
+                getters: {
                     ...(moduleData.getters || {}),
                     ...(part.getters || {})
                 },
-                "mutations": {
+                mutations: {
                     ...(moduleData.mutations || {}),
                     ...(part.mutations || {})
                 },
-                "actions": {
+                actions: {
                     ...(moduleData.actions || {}),
                     ...(part.actions || {})
                 }

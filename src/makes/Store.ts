@@ -1,14 +1,32 @@
+import {
+    AnyAction,
+    Store as ReduxStore
+} from "redux";
 import * as redux from "redux";
 
-import createModule from "../utils/createModule";
+import {
+    IStore,
+    IStoreOptions,
+    IModuleOptions
+} from "../types";
+
+import StoreModule from "./StoreModule";
 
 
-class Store {
-    modules:any;
+interface StoreOptions {
+    modules:{
+        [name:string]:IModuleOptions<any>;
+    };
+    reducers:any;
+    middlewares:any[];
+}
+
+
+class Store implements IStore {
     store:any;
-    [key:string]:any;
+    modules:IStore["modules"] = {};
 
-    constructor(params:any) {
+    constructor(params:IStoreOptions) {
         const {
             modules = {},
             reducers = {},
@@ -21,40 +39,55 @@ class Store {
         let modulesMiddlewares:any = [];
 
         for(let name in modules) {
-            this.modules[name] = createModule(modules[name]);
-            this.modules[name].name = name;
+            // this.modules[name] = createModule(modules[name]);
+            this.modules[name] = new StoreModule(name, modules[name]);
 
             modulesRedusers[name] = this.modules[name].reduce();
             modulesMiddlewares.push(this.modules[name].middleware());
         }
 
         let reducer = redux.combineReducers({
-            ...modulesRedusers,
-            ...reducers
+            ...reducers,
+            ...modulesRedusers
         });
 
         let middleware = redux.applyMiddleware(...[
-            ...modulesMiddlewares,
-            ...middlewares
+            ...middlewares,
+            ...modulesMiddlewares
         ]);
 
         this.store = redux.createStore(reducer, {}, middleware);
 
         for(let name in this.modules) {
-            this.modules[name].setActions(this.store);
+            this.modules[name].setActions(this);
 
+            // @ts-ignore
             if(!this[name]) {
+                // @ts-ignore
                 this[name] = this.modules[name];
             }
         }
     }
 
-    getStore() {
+    getStore():ReduxStore {
         return this.store;
     }
 
-    getModules() {
+    getState() {
+        return this.store.getState();
+    }
+
+    getModules():IStore["modules"] {
         return this.modules;
+    }
+
+    dispatch(action:AnyAction):any {
+        if(this.store) {
+            return this.store.dispatch(action);
+        }
+        else {
+            console.log("Store.dispatch", action);
+        }
     }
 }
 

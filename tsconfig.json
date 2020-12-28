@@ -1,11 +1,15 @@
 {
     "compilerOptions": {
-        "target": "es2015",
+        "allowJs": true,
+        "target": "ES6",
         "module": "commonjs",
-        "declaration": true,
+        "baseUrl": "./src",
         "outDir": "./lib",
         "strict": true,
-        "typeRoots": ["./node_modules/@types"]
+        "declaration": true,
+        "typeRoots": ["./node_modules/@types"],
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
     },
     "include": ["src"],
     "exclude": ["node_modules", "lib", "./**/__tests__/*"]

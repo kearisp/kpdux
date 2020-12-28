@@ -1,23 +1,33 @@
-import compose from "./utils/compose";
-import mixin from "./utils/mixin";
-import createStore from "./utils/createStore";
-import createModule from "./utils/createModule";
+import mixin from "./tools/mixin";
+import createStore from "./tools/createStore";
+import createModule from "./tools/createModule";
+import ormFactory, {
+    ormActions
+} from "./tools/ormFactory";
+import Model from "./makes/Model";
+
 import {
-    IModule
-} from "./interfaces";
+    IModule,
+    IModuleOptions,
+    IORMState
+} from "./types";
 
 
 export {
-    compose,
+    Model,
     mixin,
     createStore,
     createModule,
-    IModule
+    ormFactory,
+    ormActions,
+    IModule,
+    IModuleOptions,
+    IORMState
 };
 
 export default {
-    "compose": compose,
-    "mixin": mixin,
-    "createStore": createStore,
-    "createModule": createModule
+    mixin: mixin,
+    createStore: createStore,
+    createModule: createModule,
+    ormFactory: ormFactory
 };

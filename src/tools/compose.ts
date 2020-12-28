@@ -1,4 +1,4 @@
-export default function(...args:any[]) {
+export default (...args:any[]) => {
     let composes = [];
 
     for(let i = 0; i < args.length; i++) {

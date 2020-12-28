@@ -1,84 +1,85 @@
 import * as redux from "redux";
+import {AnyAction} from "redux";
+
+import {
+    IGetters,
+    IRootGetters,
+    IGetterHandlers,
+    IReduceHandlers,
+    IMiddlewareHandlers,
+    IActionHandlers,
+    IMutationHandlers,
+    IModule,
+    IModuleOptions,
+    IStore
+} from "../types";
 
 
-class StoreModule {
-    [key:string]:any;
+class StoreModule<State = any> implements IModule<State> {
+    name:string;
+    store?:IStore;
+    state:State;
+    getterHandlers:IGetterHandlers<State> = {};
+    reduceHandlers:IReduceHandlers<State> = {};
+    middlewareHandlers:IMiddlewareHandlers<State> = {};
+    actionHandlers:IActionHandlers<State> = {};
+    mutationHandlers:IMutationHandlers<State> = {};
+
+    get getters():IGetters {
+        // return Object.keys(this.getterHandlers).reduce<IGetters>((getters:IGetters, name:string) => {
+        //     Object.defineProperties()
+        //
+        //     return getters;
+        // }, {});
+
+        return Object.defineProperties({}, Object.keys(this.getterHandlers).reduce((getters:any, name:string) => {
+            getters[name] = {
+                get: this.getGetterCreator(this.getterHandlers[name])
+            };
+
+            return getters;
+        }, {}));
+    }
+
+    get rootGetters():IRootGetters {
+        if(this.store) {
+            return Object.keys(this.store.modules).reduce((rootGetters:IRootGetters, name:string) => {
+                // @ts-ignore
+                rootGetters[name] = this.store.modules[name].getters;
+
+                return rootGetters;
+            }, {});
+        //     Object.keys(this.store.kpduxModules).map((name:string) => {
+        //         rootGetters[name] = this.store.kpduxModules[name].getters;
+        //     });
+        }
+
+        return {};
+    }
 
     /**
      * @constructor
      * @param name      string
-     * @param params    object
+     * @param params    StoreModuleOptions
      */
-    constructor(name:string, params:any = {}) {
+    constructor(name:string, params:IModuleOptions<State> = {}) {
+        const {
+            state = {},
+            getters = {},
+            reduces = {},
+            middlewares = {},
+            actions = {},
+            mutations = {}
+        } = params;
+
         this.name = name;
+        this.state = state;
 
-        this.state = {};
-        this.getters = {};
-        this._data = {
-            "store": {},
-            "init": () => {},
-            "reduces": {},
-            "getters": {},
-            "middlewares": {},
-            "mutations": {},
-            "actions": {},
-            "mutationsCreators": {},
-            "actionsCreators": {}
-        };
-
-        if(params._data) {
-            params = params._data;
-        }
-
-        if(params.name) {
-            this.name = params.name;
-        }
-
-        if(typeof params.init === "function") {
-            this._data.init = params.init;
-        }
-
-        if(params.state) {
-            this.state = params.state;
-        }
-
-        if(params.reduces) {
-            this._data.reduces = params.reduces;
-        }
-
-        if(params.middlewares) {
-            this._data.middlewares = params.middlewares;
-        }
-
-        if(params.mutations) {
-            this._data.mutations = params.mutations;
-        }
-
-        if(params.actions) {
-            this._data.actions = params.actions;
-        }
-
-        if(params.getters) {
-            this._data.getters = params.getters;
-        }
-
-        Object.defineProperty(this, "rootGetters", {
-            "get": () => {
-                return this.getRootGetters();
-            }
-        });
-    }
-
-    getRootGetters() {
-        let rootGetters:any = {};
-
-        if(this.store.kpduxModules) {
-            Object.keys(this.store.kpduxModules).map((name) => {
-                rootGetters[name] = this.store.kpduxModules[name].getters;
-            });
-        }
-
-        return rootGetters;
+        this.reduceHandlers = reduces;
+        this.middlewareHandlers = middlewares;
+        this.getterHandlers = getters;
+        this.actionHandlers = actions;
+        this.mutationHandlers = mutations;
     }
 
     getGetterCreator(getter:any) {
@@ -86,36 +87,32 @@ class StoreModule {
             return getter.apply(this, [
                 this.getState(),
                 this.getters,
-                this.store.getState(),
-                this.getRootGetters()
+                this.store ? this.store.getState() : {},
+                this.rootGetters
             ]);
         };
     }
 
     getActionCreator(name:string) {
-        let _this = this;
-
-        return function() {
+        return (...args:any[]) => {
             return {
-                "type": _this.name + "/" + name,
-                "data": arguments
+                "type": this.name + "/" + name,
+                "data": args
             };
-        }
+        };
     }
 
     reduce() {
-        return (state:any, action:any) => {
+        return (state:State, action:any) => {
             return this.onReduce(state, action);
-        }
+        };
     }
 
     middleware() {
-        let _this = this;
-
-        return (store:any) => {
+        return (state:State) => {
             return (next:any) => {
                 return (action:any) => {
-                    let res = _this.onMiddleware(store, action);
+                    let res = this.onMiddleware(state, action);
 
                     if(res) {
                         return Promise.resolve(res).then((data:any) => {
@@ -132,46 +129,32 @@ class StoreModule {
         };
     }
 
-    onReduce(state:any, action:any) {
+    onReduce(state:State, action:AnyAction):State {
         if(!state) {
             state = this.state;
         }
 
         let reducer = null;
 
-        if(this._data.reduces["*"]) {
-            reducer = this._data.reduces["*"];
-
-            let nState = reducer.apply(this, [state, action]);
-
-            state = {
-                ...nState
-            };
+        if(this.reduceHandlers["*"]) {
+            state = this.reduceHandlers["*"].apply(this, [state, action]);
         }
 
-        if(this._data.reduces[action.type]) {
-            reducer = this._data.reduces[action.type];
+        if(action.type) {
+            if(this.reduceHandlers[action.type]) {
+                state = this.reduceHandlers[action.type].apply(this, [state, action]);
+            }
 
-            let nState = reducer.apply(this, [state, action]);
-
-            return {
-                ...nState
-            };
-        }
-        else {
             let [name, type] = action.type.split("/");
 
-            if(this.name === name && this._data.mutations[type]) {
-                reducer = this._data.mutations[type];
+            if(this.name === name && this.mutationHandlers[type]) {
+                reducer = this.mutationHandlers[type];
 
                 let nState = {
                     ...state
                 };
 
-                reducer.apply(this, [
-                    nState,
-                    ...action.data
-                ]);
+                reducer.apply(this, [nState, ...action.data]);
 
                 return nState;
             }
@@ -180,20 +163,21 @@ class StoreModule {
         return state;
     }
 
-    onMiddleware(store:any, action:any) {
-        if(this._data.middlewares["*"]) {
-            this._data.middlewares["*"].apply(this, [action]);
+    onMiddleware(state:State, action:AnyAction):any {
+        if(this.middlewareHandlers["*"]) {
+            this.middlewareHandlers["*"].apply(this, [state, action]);
         }
 
-        if(this._data.middlewares[action.type]) {
-            return this._data.middlewares[action.type].apply(this, [action]);
+        if(this.middlewareHandlers[action.type]) {
+            return this.middlewareHandlers[action.type].apply(this, [state, action]);
         }
         else {
             if(action.type) {
                 let [name, type] = action.type.split("/");
 
-                if(this.name === name && this._data.actions[type]) {
-                    return this._data.actions[type].apply(this, action.data);
+                if(this.name === name && this.actionHandlers[type]) {
+                    // @ts-ignore
+                    return this.actionHandlers[type].apply(this, action.data);
                 }
             }
         }
@@ -201,39 +185,16 @@ class StoreModule {
         return null;
     }
 
-    setActions(store:any) {
+    setActions(store:IStore) {
         this.store = store;
 
-        this._data.init.apply(this, [store]);
-
-        if(!store.kpduxModules) {
-            store.kpduxModules = {};
-        }
-
-        store.kpduxModules[this.name] = this;
-
-        for(let i in this._data.mutations) {
-            this._data.mutationsCreators[i] = this.getActionCreator(i);
-        }
-
-        for(let i in this._data.actions) {
-            this._data.actionsCreators[i] = this.getActionCreator(i);
-        }
-
-        for(let i in this._data.mutationsCreators) {
+        for(let i in this.actionHandlers) {
+            // @ts-ignore
             if(!this[i]) {
+                // @ts-ignore
                 this[i] = redux.bindActionCreators(
-                    this._data.mutationsCreators[i],
-                    store.dispatch
-                );
-            }
-        }
-
-        for(let i in this._data.actionsCreators) {
-            if(!this[i]) {
-                this[i] = redux.bindActionCreators(
-                    this._data.actionsCreators[i],
-                    store.dispatch
+                    this.getActionCreator(i),
+                    (action:any) => store.dispatch(action)
                 );
             }
             else {
@@ -241,24 +202,38 @@ class StoreModule {
             }
         }
 
-        for(let i in this._data.getters) {
+        for(let i in this.mutationHandlers) {
+            // @ts-ignore
             if(!this[i]) {
-                this[i] = this.getGetterCreator(this._data.getters[i]);
-
-                Object.defineProperty(this.getters, i, {
-                    "get": this[i],
-                    "set": function() {}
-                });
+                // @ts-ignore
+                this[i] = redux.bindActionCreators(
+                    this.getActionCreator(i),
+                    (action:any) => store.dispatch(action)
+                );
             }
             else {
                 console.error(this.name, i);
             }
         }
+
+        // for(let i in this.getterHandlers) {
+        //     if(!this[i]) {
+        //         this[i] = this.getGetterCreator(this.getterHandlers[i]);
+        //
+        //         Object.defineProperty(this.getters, i, {
+        //             "get": this[i],
+        //             "set": function() {}
+        //         });
+        //     }
+        //     else {
+        //         console.error(this.name, i);
+        //     }
+        // }
     }
 
-    dispatch(action:any, ...args:any[]) {
-        return this.store.dispatch({
-            "type": action,
+    dispatch(type:string, ...args:any[]) {
+        return this.store && this.store.dispatch({
+            "type": type,
             "data": args
         });
     }
