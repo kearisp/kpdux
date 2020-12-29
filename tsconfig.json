@@ -7,10 +7,16 @@
         "outDir": "./lib",
         "strict": true,
         "declaration": true,
-        "typeRoots": ["./node_modules/@types"],
+        "typeRoots": [
+            "./node_modules/@types"
+        ],
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true
     },
     "include": ["src"],
-    "exclude": ["node_modules", "lib", "./**/__tests__/*"]
+    "exclude": [
+        "node_modules",
+        "lib",
+        "./**/__tests__/*"
+    ]
 }

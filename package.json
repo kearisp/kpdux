@@ -17,12 +17,14 @@
     },
     "homepage": "https://github.com/kearisp/kpdux/blob/master/README.md",
     "scripts": {
-        "prepublish": "npm run build",
+        "prepare": "npm run build",
+        "prebuild": "npm install",
+        "prewatch": "npm install",
         "build": "tsc -b",
-        "watch:build": "tsc -b --watch"
+        "watch": "tsc -b --watch"
     },
     "peerDependencies": {
-        "lodash": "x.x.x.",
+        "lodash": "x.x.x",
         "redux": "4.x.x",
         "redux-orm": "0.x.x"
     },
